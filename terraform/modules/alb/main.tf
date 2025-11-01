@@ -1,20 +1,63 @@
-terraform {
-  required_version = ">= 1.0.0" # Ensure that the Terraform version is 1.0.0 or higher
+# ALB용 SG (80 오픈)
+resource "aws_security_group" "alb" {
+  name        = "${var.name_prefix}-alb-sg"
+  description = "Allow HTTP 80 to ALB"
+  vpc_id      = var.vpc_id
 
-  required_providers {
-    aws = {
-      source = "hashicorp/aws" # Specify the source of the AWS provider
-      version = "~> 4.0"        # Use a version of the AWS provider that is compatible with version
-    }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-provider "aws" {
-  region = "us-east-1" # Set the AWS region to US East (N. Virginia)
+# ALB 본체
+resource "aws_lb" "this" {
+  name               = "${var.name_prefix}-alb"
+  load_balancer_type = "application"
+  subnets            = var.subnets
+  security_groups    = [aws_security_group.alb.id]
 }
 
-resource "aws_instance" "aws_example" {
-  tags = {
-    Name = "ExampleInstance" # Tag the instance with a Name tag for easier identification
+# Target Group (Fargate용 ip 타입)
+resource "aws_lb_target_group" "tg" {
+  name        = "${var.name_prefix}-tg"
+  port        = var.target_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = var.hc_path
+    matcher             = "200-399"
+    interval            = 30
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
   }
 }
+
+# HTTP Listener
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = var.listener_port
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg.arn
+  }
+}
+
+output "http_listener_arn" { value = aws_lb_listener.http.arn }
+output "target_group_arn"  { value = aws_lb_target_group.tg.arn }
+output "dns_name"          { value = aws_lb.this.dns_name }
+output "security_group_id" { value = aws_security_group.alb.id }
+output "alb_arn"           { value = aws_lb.this.arn }
