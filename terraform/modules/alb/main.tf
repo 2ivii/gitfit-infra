@@ -29,7 +29,7 @@ resource "aws_lb" "this" {
 
 # Target Group (Fargate용 ip 타입)
 resource "aws_lb_target_group" "tg" {
-  name        = "${var.name_prefix}-tg"
+  name_prefix = var.tg_prefix
   port        = var.target_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -42,7 +42,12 @@ resource "aws_lb_target_group" "tg" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
+
+  lifecycle {
+    create_before_destroy = true           # 안전 교체
+  }
 }
+
 
 # HTTP Listener
 resource "aws_lb_listener" "http" {

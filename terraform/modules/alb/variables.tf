@@ -24,3 +24,8 @@ variable "target_port" {
   type    = number
   default = 8080
 }
+
+variable "tg_prefix" {
+  type    = string
+  default = "gfit-"
+}
