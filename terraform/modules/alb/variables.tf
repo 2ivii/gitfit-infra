@@ -29,3 +29,14 @@ variable "tg_prefix" {
   type    = string
   default = "gfit-"
 }
+
+# HTTPS 옵션
+variable "enable_https" {
+  type    = bool
+  default = true
+}
+
+variable "certificate_arn" {
+  type    = string
+  default = ""           # ACM ARN 주입되면 443 리스너 생성
+}

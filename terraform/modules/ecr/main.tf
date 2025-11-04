@@ -1,20 +1,16 @@
-terraform {
-  required_version = ">= 1.0.0" # Ensure that the Terraform version is 1.0.0 or higher
+resource "aws_ecr_repository" "this" {
+  name                 = "${var.name_prefix}-repo"
+  image_tag_mutability = "MUTABLE"
 
-  required_providers {
-    aws = {
-      source = "hashicorp/aws" # Specify the source of the AWS provider
-      version = "~> 4.0"        # Use a version of the AWS provider that is compatible with version
-    }
+  image_scanning_configuration {
+    scan_on_push = true
   }
-}
 
-provider "aws" {
-  region = "us-east-1" # Set the AWS region to US East (N. Virginia)
-}
-
-resource "aws_instance" "aws_example" {
   tags = {
-    Name = "ExampleInstance" # Tag the instance with a Name tag for easier identification
+    Name = "${var.name_prefix}-ecr"
   }
+}
+
+output "repository_url" {
+  value = aws_ecr_repository.this.repository_url
 }
