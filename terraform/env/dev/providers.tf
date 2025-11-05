@@ -10,5 +10,5 @@ terraform {
 
 provider "aws" {
   region  = "ap-northeast-2"
-  profile = "gitfit-dev"   # 아까 aws configure 한 프로필명
+  profile = "gitfit-dev" # 아까 aws configure 한 프로필명
 }

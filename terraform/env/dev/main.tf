@@ -74,28 +74,27 @@ module "alb" {
   subnets         = module.network.public_subnet_ids
   hc_path         = "/"
   target_port     = 80
-  tg_prefix       = "gfit-"                   # 6자 이내
+  tg_prefix       = "gfit-" # 6자 이내
   enable_https    = true
   certificate_arn = module.acm.certificate_arn
 }
 
 # 4-4) Route53 A 레코드 → ALB ALIAS
 module "dns" {
-  source       = "../../modules/dns"
-  zone_id      = data.aws_route53_zone.root.zone_id
-  root_name    = "gitfit.site"
-  alb_dns_name = module.alb.dns_name
-  alb_zone_id  = module.alb.alb_zone_id
-  create_www   = true
+  source        = "../../modules/dns"
+  zone_name     = "gitfit.site"
+  alb_dns_name  = module.alb.dns_name
+  alb_zone_id   = "ZWKZPGTI48KDX" # 서울 리전(ALB) Hosted Zone ID
+  api_subdomain = "api"
+
+  # 필요 시 Vercel 값 재정의
+  # vercel_root_ip     = "76.76.21.21"
+  # vercel_www_cname   = "cname.vercel-dns.com"
 }
 
-
-
-
-output "message"            { value = "Terraform is connected to AWS successfully!" }
-output "vpc_id"             { value = module.network.vpc_id }
-output "public_subnet_ids"  { value = module.network.public_subnet_ids }
+output "message" { value = "Terraform is connected to AWS successfully!" }
+output "vpc_id" { value = module.network.vpc_id }
+output "public_subnet_ids" { value = module.network.public_subnet_ids }
 output "private_subnet_ids" { value = module.network.private_subnet_ids }
 output "alb_dns_name" { value = module.alb.dns_name }
 output "service_name" { value = module.ecs.service_name }
-
