@@ -6,4 +6,5 @@ github_client_id     = "Ov23lik817jCodugbipL"
 github_client_secret = "30b280a2a2f61417ac73071a4aa6620e498cc4e4"
 
 jwt_secret      = "Y6AMnY3UOXqxopD41nVK9vZb9H0RQOpuiyRO3UNdZM8="
-ai_server_url   = "http://localhost:8000"
+ai_server_url   = "https://ai.gitfit.site"
+ai_ec2_key_name = "gitfit-ai-kwy"

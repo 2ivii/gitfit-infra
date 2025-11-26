@@ -11,32 +11,22 @@ variable "subnets" {
 }
 
 variable "hc_path" {
-  type    = string
-  default = "/"
-}
-
-variable "listener_port" {
-  type    = number
-  default = 80
+  type = string
 }
 
 variable "target_port" {
-  type    = number
-  default = 8080
+  type = number
 }
 
 variable "tg_prefix" {
-  type    = string
-  default = "gfit-"
+  type = string
 }
 
-# HTTPS 옵션
 variable "enable_https" {
   type    = bool
   default = true
 }
 
 variable "certificate_arn" {
-  type    = string
-  default = ""           # ACM ARN 주입되면 443 리스너 생성
+  type = string
 }
