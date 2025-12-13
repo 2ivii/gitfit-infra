@@ -50,3 +50,9 @@ variable "env_vars" {
   type    = map(string)
   default = {}
 }
+
+variable "task_policy_json" {
+  type        = string
+  description = "Additional IAM policy JSON to attach to task role"
+  default     = null
+}

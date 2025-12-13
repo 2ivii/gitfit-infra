@@ -119,6 +119,19 @@ resource "aws_ecs_service" "svc" {
   }
 }
 
+resource "aws_iam_role_policy" "task_inline" {
+  name = "${var.name_prefix}-task-inline"
+  role = aws_iam_role.task.id
+
+  # null이면 빈 정책이라도 넣어주면 plan이 안정적
+  policy = coalesce(var.task_policy_json, jsonencode({
+    Version = "2012-10-17"
+    Statement = []
+  }))
+}
+
+
+
 output "service_name" {
   value = aws_ecs_service.svc.name
 }

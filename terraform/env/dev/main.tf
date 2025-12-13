@@ -54,6 +54,8 @@ module "ecs" {
   memory               = 512
   alb_target_group_arn = module.alb.target_group_arn
   alb_sg_id            = module.alb.security_group_id
+  task_policy_json = data.aws_iam_policy_document.ecs_s3_assets.json
+
 
   env_vars = {
     SPRING_PROFILES_ACTIVE = "dev"
@@ -321,6 +323,64 @@ resource "aws_db_instance" "db" {
     Name = "gitfit-dev-db"
   }
 }
+
+########################################
+# S3 (Assets Bucket)
+########################################
+module "s3_assets" {
+  source = "../../modules/s3"
+
+  bucket_name         = "gitfit-dev-assets"
+  versioning          = true
+  force_destroy       = false
+  block_public_access = true
+
+  tags = {
+    Name    = "gitfit-dev-assets"
+    Project = "gitfit"
+    Env     = "dev"
+  }
+}
+
+########################################
+# S3 CORS (for browser upload/download)
+########################################
+resource "aws_s3_bucket_cors_configuration" "assets" {
+  bucket = module.s3_assets.bucket_name
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+    allowed_origins = [
+      "https://gitfit.site",
+      "https://www.gitfit.site",
+      "https://api.gitfit.site",
+      "https://ai.gitfit.site"
+    ]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
+data "aws_iam_policy_document" "ecs_s3_assets" {
+  statement {
+    sid     = "ListBucket"
+    actions = ["s3:ListBucket"]
+    resources = [module.s3_assets.bucket_arn]
+  }
+
+  statement {
+    sid = "ObjectRW"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+    resources = ["${module.s3_assets.bucket_arn}/*"]
+  }
+}
+
+
 
 ########################################
 # 출력값
