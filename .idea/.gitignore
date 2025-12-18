@@ -1,0 +1,22 @@
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+tf.plan
+# .terraform.lock.hcl  ← 커밋 권장(무시하지 않기)
+
+# Secrets / creds
+*.tfvars
+.env
+.env.*
+*.pem
+*.key
+id_rsa*
+.aws/
+
